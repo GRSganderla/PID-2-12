@@ -234,13 +234,13 @@ if __name__ == "__main__":
     for i in range(len(arquivos)):
         image_cru = cv2.imread(arquivos[i])
 
-        imagem_borrada = gaussian_blur(image_cru, 9, verbose=False)
+        imagem_borrada = gaussian_blur(image_cru, 9, verbose=True)
 
-        gradiente, direcao_gradiente = deteccao_borda(imagem_borrada, filtro_sobel, converte_degraus=True, verbose=False)
+        gradiente, direcao_gradiente = deteccao_borda(imagem_borrada, filtro_sobel, converte_degraus=True, verbose=True)
 
-        imagem_supremida = supressao_non_max(gradiente, direcao_gradiente, verbose=False)
+        imagem_supremida = supressao_non_max(gradiente, direcao_gradiente, verbose=True)
 
-        imagem_limitada = limiar(imagem_supremida, 5, 20, fraco=50, verbose=False)
+        imagem_limitada = limiar(imagem_supremida, 5, 20, fraco=50, verbose=True)
 
         imagem = hipotese(imagem_limitada, fraco=50)
 
@@ -249,18 +249,18 @@ if __name__ == "__main__":
         pontos = np.fliplr(pontos)
         print(f"Levou {time.time() - inicio}")
 
-        folhas = acha_folhas(pontos)
+        #folhas = acha_folhas(pontos)
         print(f"Levou {time.time() - inicio}")
         
-        folha_atual = 0
+        #folha_atual = 0
 
-        for folha in folhas:
+        #for folha in folhas:
 
-            folha_atual += 1
-            x, y, w, h = cv2.boundingRect(folha)
-            x, y, w, h = x, y, w, h
-            imagem_detectada = imagem[y:y+h, x:x+w]
-            imagem_cortada = image_cru[y:y+h, x:x+w]
-            
-            cv2.imwrite(arquivos[i][:-4] + f"-{folha_atual}.png", imagem_cortada)
-            cv2.imwrite(arquivos[i][:-4] + f"-{folha_atual}-P.png", imagem_detectada)
+            #folha_atual += 1
+        x, y, w, h = cv2.boundingRect(pontos)
+        x, y, w, h = x, y, w, h
+        imagem_detectada = imagem[y:y+h, x:x+w]
+        #imagem_cortada = image_cru[y:y+h, x:x+w]
+        
+        cv2.imwrite(arquivos[i][:-4] + "-Canny.png", imagem_detectada)
+        #cv2.imwrite(arquivos[i][:-4] + f"-{folha_atual}-P.png", imagem_detectada)
