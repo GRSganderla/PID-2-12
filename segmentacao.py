@@ -183,14 +183,56 @@ def hipotese(imagem, fraco):
 
     return imagem_final
 
+def rec_adiciona_posicao(visitado, x, maximo, posicoes, folha):
+
+    if x >= 0 and x < maximo:
+
+        visitado[x] = 1
+        folha.append(posicoes[x])
+
+        for ponto in folha: 
+            
+            livres = np.where(visitado == 0)[0]
+            print(len(livres))
+
+            if len(livres) > 0: 
+                for i in livres:
+                    if (visitado[i] == 0) and (abs(ponto[0]-posicoes[i][0]) <= 75) and (abs(ponto[1]-posicoes[i][1]) <= 75):
+                        visitado[i] = 1
+                        folha.append(posicoes[i])
+    
+    return folha
+
+
+def acha_folhas(posicoes):
+
+    visitado = np.zeros(posicoes.shape[0], dtype=int)
+
+    maximo = posicoes.shape[0]
+
+    folhas = []
+
+    i = 0
+
+    for x in range(0, maximo):
+
+        print(0, maximo)
+
+        if visitado[x] == 0:
+            folha = []
+            folha = rec_adiciona_posicao(visitado, x, maximo, posicoes, folha)
+            folhas.append(np.array(folha))
+
+    return np.array(folhas)
+
 if __name__ == "__main__":
     arquivos = [join("./Folhas/", f) for f in listdir("./Folhas/") if isfile(join("./Folhas", f))]
     filtro_sobel = np.array([[-1, 0, 1],[-2, 0, 2],[-1, 0, 1]])
 
     inicio = time.time()
 
-    for i in range(1):
-        image_cru = cv2.imread(arquivos[0])
+    for i in range(len(arquivos)):
+        image_cru = cv2.imread(arquivos[i])
 
         imagem_borrada = gaussian_blur(image_cru, 9, verbose=False)
 
@@ -205,13 +247,20 @@ if __name__ == "__main__":
         pontos = np.argwhere(imagem==255)
 
         pontos = np.fliplr(pontos)
-
-        x, y, w, h = cv2.boundingRect(pontos)
-        x, y, w, h = x, y, w, h
-        crop = imagem[y:y+h, x:x+w]
-        
         print(f"Levou {time.time() - inicio}")
 
-        plt.imshow(crop, cmap='gray')
-        plt.title("Deteccao de Borda (Canny)")
-        plt.show()
+        folhas = acha_folhas(pontos)
+        print(f"Levou {time.time() - inicio}")
+        
+        folha_atual = 0
+
+        for folha in folhas:
+
+            folha_atual += 1
+            x, y, w, h = cv2.boundingRect(folha)
+            x, y, w, h = x, y, w, h
+            imagem_detectada = imagem[y:y+h, x:x+w]
+            imagem_cortada = image_cru[y:y+h, x:x+w]
+            
+            cv2.imwrite(arquivos[i][:-4] + f"-{folha_atual}.png", imagem_cortada)
+            cv2.imwrite(arquivos[i][:-4] + f"-{folha_atual}-P.png", imagem_detectada)
