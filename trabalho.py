@@ -285,4 +285,4 @@ if __name__ == "__main__":
         print(f'Para processar as folhas da imagem {arquivos[i][9:-4]} levou {time.time() - inicio}')
 
         # escreve o csv
-        planilha.to_csv('Dados_Folhas.csv', index=False)
+    planilha.to_csv('Dados_Folhas.csv', index=False)
