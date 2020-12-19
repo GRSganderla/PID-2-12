@@ -183,48 +183,6 @@ def hipotese(imagem, fraco):
 
     return imagem_final
 
-def rec_adiciona_posicao(visitado, x, maximo, posicoes, folha):
-
-    if x >= 0 and x < maximo:
-
-        visitado[x] = 1
-        folha.append(posicoes[x])
-
-        for ponto in folha: 
-            
-            livres = np.where(visitado == 0)[0]
-            print(len(livres))
-
-            if len(livres) > 0: 
-                for i in livres:
-                    if (visitado[i] == 0) and (abs(ponto[0]-posicoes[i][0]) <= 75) and (abs(ponto[1]-posicoes[i][1]) <= 75):
-                        visitado[i] = 1
-                        folha.append(posicoes[i])
-    
-    return folha
-
-
-def acha_folhas(posicoes):
-
-    visitado = np.zeros(posicoes.shape[0], dtype=int)
-
-    maximo = posicoes.shape[0]
-
-    folhas = []
-
-    i = 0
-
-    for x in range(0, maximo):
-
-        print(0, maximo)
-
-        if visitado[x] == 0:
-            folha = []
-            folha = rec_adiciona_posicao(visitado, x, maximo, posicoes, folha)
-            folhas.append(np.array(folha))
-
-    return np.array(folhas)
-
 if __name__ == "__main__":
     arquivos = [join("./Folhas/", f) for f in listdir("./Folhas/") if isfile(join("./Folhas", f))]
     filtro_sobel = np.array([[-1, 0, 1],[-2, 0, 2],[-1, 0, 1]])
@@ -234,13 +192,17 @@ if __name__ == "__main__":
     for i in range(len(arquivos)):
         image_cru = cv2.imread(arquivos[i])
 
-        imagem_borrada = gaussian_blur(image_cru, 9, verbose=True)
+        imagem_borrada = gaussian_blur(image_cru, 9, verbose=False)
 
-        gradiente, direcao_gradiente = deteccao_borda(imagem_borrada, filtro_sobel, converte_degraus=True, verbose=True)
+        gradiente, direcao_gradiente = deteccao_borda(imagem_borrada, filtro_sobel, converte_degraus=True, verbose=False)
+        cv2.imwrite(arquivos[i][:-4] + "-Sobel.png", gradiente)
+        print(f"Levou {time.time() - inicio}")
 
-        imagem_supremida = supressao_non_max(gradiente, direcao_gradiente, verbose=True)
+        '''imagem_supremida = supressao_non_max(gradiente, direcao_gradiente, verbose=True)
+        cv2.imwrite(arquivos[i][:-4] + "-NonMax.png", imagem_supremida)
 
         imagem_limitada = limiar(imagem_supremida, 5, 20, fraco=50, verbose=True)
+        cv2.imwrite(arquivos[i][:-4] + "-Limiar.png", imagem_limitada)
 
         imagem = hipotese(imagem_limitada, fraco=50)
 
@@ -250,7 +212,6 @@ if __name__ == "__main__":
         print(f"Levou {time.time() - inicio}")
 
         #folhas = acha_folhas(pontos)
-        print(f"Levou {time.time() - inicio}")
         
         #folha_atual = 0
 
@@ -263,4 +224,4 @@ if __name__ == "__main__":
         #imagem_cortada = image_cru[y:y+h, x:x+w]
         
         cv2.imwrite(arquivos[i][:-4] + "-Canny.png", imagem_detectada)
-        #cv2.imwrite(arquivos[i][:-4] + f"-{folha_atual}-P.png", imagem_detectada)
+        #cv2.imwrite(arquivos[i][:-4] + f"-{folha_atual}-P.png", imagem_detectada)'''
