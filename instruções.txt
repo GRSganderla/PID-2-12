@@ -1,0 +1,13 @@
+Antes de executar o código, verifique se tem as seguintes bibilotecas instaladas, se não tiver o comando para instalar é apresentado junto:
+- Pandas (pip install pandas)
+- Cv2 ou OpenCV (pip install opencv-python)
+- Numpy (pip install numpy)
+- Matplotlib (pip install matplotlib)
+- Math (pip install math)
+
+Para executar o codigo, só é necessário executar o script Python e ter no mesmo diretorio que o codigo-fonte um diretorio com o nome 'Folhas' contendo as imagens, o scrip pode ser rodado como:
+    py trabalho.py
+
+Se quiser da para alterar o limite da escala de cinza dentro do codigo fonte, para aceitar escalas maiores ou menores.
+
+O tempo para processar uma das imagens (6000x4000 pixels) foi de 300 a 700 seg, isso sendo 5 a 12 min.
