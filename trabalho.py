@@ -230,25 +230,23 @@ def aplica_tags(imagem_total, imagem, visitados, nome_arq, folha_quant, planilha
                     linha_planilha = {
                         'ID Imagem': nome_arq[9:],
                         'ID Folha':  folha_quant,
-                        'Perímetro': perimetro1,
-                        'Diâmetro Mínimo': diametro_m,
-                        'Diâmetro Máximo': diametro_M,
+                        'Perimetro': perimetro1,
+                        'Diametro Minimo': diametro_m,
+                        'Diametro Maximo': diametro_M,
                         'Excentricidade': excentricidade
                     }
 
                     # muda o id da folha seguinte e adiciona na planilha a nova sub-imagem
                     cor += 15
                     planilha = planilha.append(pd.DataFrame(linha_planilha, index=[folha_quant-1], columns=colunas), ignore_index=True)
-                    print(planilha)
             else:
                 visitados[x,y] = True
                 
     # é chamado recursivamente essa função porque de algum jeito os for's ali de cima não passam por todos os pontos, vai saber porque
     if len(np.where(visitados==False)[0]) > 0:
-        planilha = planilha.append(aplica_tags(imagem_total, imagem, visitados, nome_arq, folha_quant, planilha), ignore_index=True)
-        print(planilha)
+        planilha_suporte = pd.DataFrame(columns=colunas)
+        planilha = planilha.append(aplica_tags(imagem_total, imagem, visitados, nome_arq, folha_quant, planilha_suporte), ignore_index=True)
     
-    print(planilha)
     return planilha
     
 
@@ -261,10 +259,12 @@ if __name__ == "__main__":
     inicio = time.time()
 
     # cria o csv
-    planilha = pd.DataFrame(columns=colunas)
+    dados_final = pd.DataFrame(columns=colunas)
 
     # para cada uma das 15 imagens dentro do diretorio Folhas
-    for i in range(1):
+    for i in range(len(arquivos)):
+        # cvs temporario
+        planilha = pd.DataFrame(columns=colunas)
 
         # le o arquivo de entrada
         imagem_total = cv2.imread(arquivos[i])
@@ -279,10 +279,10 @@ if __name__ == "__main__":
         visitados[np.where(visitados >= Limite)] = True
 
         # chama a função para gerar as sub-imagens da imagem atual
-        planilha = planilha.append(aplica_tags(imagem_total, imagem_grayscale, visitados, arquivos[i][:-4], 0, planilha), ignore_index=True)
+        dados_final = dados_final.append(aplica_tags(imagem_total, imagem_grayscale, visitados, arquivos[i][:-4], 0, planilha), ignore_index=True)
 
         # exibe o tempo necessario para extrair todas as informações da imagem atual
         print(f'Para processar as folhas da imagem {arquivos[i][9:-4]} levou {time.time() - inicio}')
 
         # escreve o csv
-    planilha.to_csv('Dados_Folhas.csv', index=False)
+    dados_final.to_csv('Dados_Folhas.csv', index=False)
